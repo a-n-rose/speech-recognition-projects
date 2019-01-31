@@ -1,7 +1,7 @@
  
 ## Extract Speech Features and Train Deep Neural Networks
 
-These scripts allow for the extraction of 2 popular sets of features for machine and deep learning: mel filterbank energies (FBANK) and mel frequency cepstral coefficients (MFCC). The features can then be fed to a CNN, LSTM, or stacked CNN+LSTM. The data generator organizes the data to the correct dimensions for each. 
+These scripts allow for the extraction of 2 popular sets of speech features for machine and deep learning: mel filterbank energies (FBANK) and mel frequency cepstral coefficients (MFCC). The features can then be fed to a CNN, LSTM, or stacked CNN+LSTM. The data generator organizes the data to the correct dimensions for each. 
 
 The default settings for the scripts are listed below. To change them, you'll have to go into their corresponding functions. Pretty easy to do though. :)
 
