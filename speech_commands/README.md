@@ -20,7 +20,7 @@ To install, enter into the command line:
 sudo apt install python3.6-venv
 ```
 
-In folder of cloned directory (i.e. "deep_learning_acoustics"), write in the command-line:
+In folder of cloned directory, write in the command-line:
 
 ```
 python3 -m venv env
