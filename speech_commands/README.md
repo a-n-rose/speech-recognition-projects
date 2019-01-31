@@ -101,9 +101,7 @@ deactivate
 
 1) Computer with CPU or GPU and sound recording capabilities, ideally via headset
 
-2) A way to examine SQL tables (I use <a href="https://sqlitebrowser.org/">DB Browser for SQLite</a>)
-
-3) Python 3.6
+2) Python 3.6
 
 To check your version type the following into the command-line (Linux):
 
@@ -111,13 +109,13 @@ To check your version type the following into the command-line (Linux):
 python3 --version
 ```
 
-To install all the python packages we will use, first start up your virtual environment (in the folder "deep_learning_acoustics"):
+To install all the python packages we will use, first start up your virtual environment:
 
 ```
 source env/bin/activate
 ```
 
-4) In your virtual environment, run 'requirements.txt' to install all necessary packages via pip. 
+4) In your virtual environment, run 'requirements.txt' to install all necessary packages via pip.
 
 ```
 (env)..$ pip install -r requirements.txt
@@ -125,13 +123,13 @@ source env/bin/activate
 
 ## Download the Data
 
-Download the speech commands dataset <a href="download.tensorflow.org/data/speech_commands_v0.01.tar.gz">here</a>
+Download the speech commands dataset <a href="download.tensorflow.org/data/speech_commands_v0.01.tar.gz">here</a>. Save the zip folder in a subdirectory called 'data' in your working directory.
 
 Note: you can explore other kinds of speech data, as long as the wavefiles are saved in directories named by the label the wavefile belongs to. i.e. in your .data/ directory, there should be subdirectories with names such as 'healthy' and 'clinical', 'female' and 'male', or, as in the speech commands dataset, all the words the neural network should be able to recognize, 'bed', 'bird', etc. 
 
 If you would like to explore male vs female speech, I have directions for how to do that <a href="https://a-n-rose.github.io/2019/01/31/small-female-male-speech-data.html">here</a>. With that database, you could also explore classifying different speech disorders.
 
-Note: the speech commands dataset includes a folder with background noises. If you'd like to include a background noise, you'll have to set that up.
+Note: the speech commands dataset includes a folder with background noises that will be used in training. If you'd like to include a background noise, you'll have to either record background noise yourself and input that filename or find some other background noise.
 
 ## Extract Features
 
@@ -145,7 +143,7 @@ Run the script.
 
 ## Train the model
 
-Find the path of the newly created .npy files. Enter these into the script 'train_models_CNN_LSTM_CNNLSTM.py'. Check the script for variables. 
+Find the path of the newly created .npy files. Enter these into the script 'train_models_CNN_LSTM_CNNLSTM.py'. Check the script for variables. **Important: insert the newly created train, validation, and test .npy filenames!**
 
 Run the script.
 
