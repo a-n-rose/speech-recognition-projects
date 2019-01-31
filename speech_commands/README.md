@@ -30,6 +30,9 @@ Compatible with the following datasets:
 
 
 ### Script 'coll_save_features_npy.py'
+
+To process entire speech commands dataset (with balanced classes), my computer took appx. 2 hours.
+
 1) collects data and labels from subdirectories and subdirectory names.
 
 * Noe: it expects the subdirectories to contain waves corresponding to the subdirectory name (i.e. subdirectory 'bird' should have wavefiles with recordings of people saying "bird")
@@ -39,8 +42,12 @@ Compatible with the following datasets:
 3) extracts speech features and saves to .npy files
 
 ### Script 'train_models_CNN_LSTM_CNNLSTM.py'
-3) loads data from .npy files
-4) trains CNN, LSTM, or CNN+LSTM models with data via a data generator
+
+The shortest processing time is with the CNN. The LSTM models depend on the number of units/cells.
+
+1) loads data from .npy files
+
+2) trains CNN, LSTM, or CNN+LSTM models with data via a data generator
 
 
 ## Requirements
