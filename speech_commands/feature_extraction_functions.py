@@ -59,9 +59,9 @@ def save_class_labels(sorted_labels,session):
         w.writerows(dict_labels.items())
     return None
 
-def get_class_distribution(class_labels,labels_list): 
+def get_class_distribution(labels_class,labels_list): 
     dict_class_distribution = {}
-    for label in class_labels:
+    for label in labels_class:
         count = 0
         for label_item in labels_list:
             if label == label_item:
@@ -70,8 +70,8 @@ def get_class_distribution(class_labels,labels_list):
     return dict_class_distribution
         
 
-def get_min_samples_per_class(class_labels, labels_list):
-    dict_class_distribution = get_class_distribution(class_labels,labels_list)
+def get_min_samples_per_class(labels_class, labels_list):
+    dict_class_distribution = get_class_distribution(labels_class,labels_list)
     min_val = (1000000, None)
     for key, value in dict_class_distribution.items():
         if value < min_val[0]:
@@ -114,9 +114,9 @@ def get_train_val_test_indices(list_length):
     return train_indices, val_indices, test_indices
 
 
-def make_dict_class_index(class_labels,labels_list):
+def make_dict_class_index(labels_class,labels_list):
     dict_class_index_list = {}
-    for label in class_labels:
+    for label in labels_class:
         dict_class_index_list[label] = []
         for i, label_item in enumerate(labels_list):
             if label == label_item:
@@ -124,9 +124,9 @@ def make_dict_class_index(class_labels,labels_list):
     return dict_class_index_list
 
 
-def assign_indices_train_val_test(class_labels,dict_class_index,max_nums_train_val_test):
+def assign_indices_train_val_test(labels_class,dict_class_index,max_nums_train_val_test):
     dict_class_dataset_index_list = {}
-    for label in class_labels:
+    for label in labels_class:
         tot_indices = dict_class_index[label]
         tot_indices_copy = tot_indices.copy()
         random.shuffle(tot_indices_copy)
@@ -309,12 +309,12 @@ def get_freq_mag(y,sr,window_size=None, window_shift=None):
     return frequencies, magnitudes
 
 
-def save_feats2npy(class_labels,dict_labels_encoded,data_filename4saving,max_num_samples,dict_class_dataset_index_list,paths_list,labels_list,feature_type,num_filters,num_features,time_step,frame_width,limit=None,delta=False,noise_wavefile=None,vad=False,dataset_index=0):
+def save_feats2npy(labels_class,dict_labels_encoded,data_filename4saving,max_num_samples,dict_class_dataset_index_list,paths_list,labels_list,feature_type,num_filters,num_features,time_step,frame_width,limit=None,delta=False,noise_wavefile=None,vad=False,dataset_index=0):
     msg = "\nExtracting features from {} samples. \nFeatures will be saved in the file {}".format(max_num_samples,data_filename4saving)
     print(msg)
 
     #create empty array to fill with values
-    expected_rows = max_num_samples*len(class_labels)*frame_width*time_step
+    expected_rows = max_num_samples*len(labels_class)*frame_width*time_step
     feats_matrix = np.zeros((expected_rows,num_features+1)) # +1 for the label
     #go through all data in dataset and fill in the matrix
     row = 0
@@ -322,7 +322,7 @@ def save_feats2npy(class_labels,dict_labels_encoded,data_filename4saving,max_num
     
     try:
         paths_labels_list_dataset = []
-        for i, label in enumerate(class_labels):
+        for i, label in enumerate(labels_class):
             #labels_list_dataset = []
             train_val_test_index_list = dict_class_dataset_index_list[label]
             #print(train_val_test_index_list[dataset_index])
@@ -351,14 +351,15 @@ def save_feats2npy(class_labels,dict_labels_encoded,data_filename4saving,max_num
     
     except Exception as e:
         print("Error occurred: {}\nStopped processing waves at row {} of new matrix.".format(e,row))
+
     finally:
         np.save(data_filename4saving+".npy",feats_matrix)
-    
+        
     return completed
     
     
 def coll_feats_manage_timestep(time_step,frame_width,wav,feature_type,num_filters,delta=False,noise_wavefile=None,vad = True):
-    feats = get_feats(wav,feature_type,num_filters,delta=False,noise_wavefile=noise_wavefile,vad = True)
+    feats = get_feats(wav,feature_type,num_filters,delta=delta,noise_wavefile=noise_wavefile,vad = vad)
     max_len = frame_width*time_step
     if feats.shape[0] < max_len:
         diff = max_len - feats.shape[0]
