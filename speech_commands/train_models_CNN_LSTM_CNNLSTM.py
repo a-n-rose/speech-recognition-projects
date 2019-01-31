@@ -229,13 +229,8 @@ def main(model_type,timesteps,frame_width,num_features,color_scale,num_labels,ep
 
 
     #load the data!!
-    #pathways to npy files containing train, val, and test data
-    train_npy_filename = "./{}_train/train_{}.npy".format(path_beginning,path_ending)
-    val_npy_filename = "./{}_val/val_{}.npy".format(path_beginning,path_ending)
-    test_npy_filename = "./{}_test/test_{}.npy".format(path_beginning,path_ending)
-
-    train_data = np.load(train_npy_filename)
-    val_data = np.load(val_npy_filename)
+    train_data = np.load(filename_train)
+    val_data = np.load(filename_val)
 
     #load these into their generators
     train_generator = Generator(model_type,train_data,timesteps,frame_width)
@@ -258,7 +253,7 @@ def main(model_type,timesteps,frame_width,num_features,color_scale,num_labels,ep
     
     print("\nNow testing the model..")
     #now to test the model on brandnew data!
-    test_data = np.load(test_npy_filename)
+    test_data = np.load(filename_test)
     test_generator = Generator(model_type,test_data,timesteps,frame_width)
     score = model.evaluate_generator(test_generator.generator(), test_data.shape[0]/(timesteps*frame_width))
     loss = round(score[0],2)
@@ -329,16 +324,14 @@ if __name__ == "__main__":
     epochs = 50
     optimizer = 'adam' # 'adam' 'sgd'
     sparse_targets = True
-    
-    #these should *NOT* include "train_", "val_", "_test", or ".npy" etc.
-    #these will be added in the script
-    file_path = "data_ALLwords_shuffled_fbank40"
-    file_name = "fbank40_deltaTrue_noiseTrue_vadTrue_timestep5_framewidth11_numlabels30_date2019y1m31d16h57m0s"
+    filename_train = "filename_train.npy"
+    filename_val = "filename_val.npy"
+    filename_test = "filename_test.npy"
     
     
     main(
         model_type,
         timesteps,frame_width,num_features,color_scale,
         num_labels,epochs,optimizer,sparse_targets,
-        file_path,file_name
+        file_path,filename_train = filename_train, filename_val = filename_val, filename_test = filename_test
         )
