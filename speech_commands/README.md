@@ -129,7 +129,7 @@ Download the speech commands dataset <a href="download.tensorflow.org/data/speec
 
 Note: you can explore other kinds of speech data, as long as the wavefiles are saved in directories named by the label the wavefile belongs to. i.e. in your .data/ directory, there should be subdirectories with names such as 'healthy' and 'clinical', 'female' and 'male', or, as in the speech commands dataset, all the words the neural network should be able to recognize, 'bed', 'bird', etc. 
 
-If you would like to explore male vs female speech, I have directions for how to do that <a href="https://a-n-rose.github.io/2019/01/31/small-female-male-speech-data.html">here</a>.
+If you would like to explore male vs female speech, I have directions for how to do that <a href="https://a-n-rose.github.io/2019/01/31/small-female-male-speech-data.html">here</a>. With that database, you could also explore classifying different speech disorders.
 
 Note: the speech commands dataset includes a folder with background noises. If you'd like to include a background noise, you'll have to set that up.
 
