@@ -139,14 +139,17 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
 
     start_feature_extraction = time.time()
 
+    #tqdm shows the progress of for loops in your commandline
+    #here it's honestly pointless, but I thought it was a cool 
+    #tool so I included it..
     for i in tqdm(range(3)):
         dataset_index = i   # 0 = train, 1 = validation, 2 = test
         
         ##if you want to limit the number of recordings that features are extracted from:
-        limit = int(max_nums_train_val_test[dataset_index]*.01)
+        #limit = int(max_nums_train_val_test[dataset_index]*.01)
         
         ##limit = None --> All .wav files in all label folders will be processed
-        #limit = None
+        limit = None
         
         extraction_completed = featfun.save_feats2npy(labels_class,dict_labels_encoded,train_val_test_filenames[dataset_index],max_nums_train_val_test[dataset_index],dict_class_dataset_index_list,paths,labels_wavefile,feature_type,num_filters,num_features,timesteps,frame_width,limit=limit,delta=delta,noise_wavefile=noise_path,vad=vad,dataset_index=dataset_index)
         
