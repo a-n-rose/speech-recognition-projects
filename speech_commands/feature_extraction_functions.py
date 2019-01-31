@@ -182,14 +182,14 @@ def get_feats(wavefile,feature_type,num_features,delta=False,noise_wavefile = No
         extracted.append("mfcc")
         features = get_mfcc(y,sr,num_mfcc=num_features)
         features -= (np.mean(features, axis=0) + 1e-8)
-        if "delta" in feature_type.lower():
+        if delta::
             delta, delta_delta = get_change_acceleration_rate(features)
             features = np.concatenate((features,delta,delta_delta),axis=1)
     elif "fbank" in feature_type.lower():
         extracted.append("fbank")
         features = get_mel_spectrogram(y,sr,num_mels = num_features)
         features -= (np.mean(features, axis=0) + 1e-8)
-        if "delta" in feature_type.lower():
+        if delta:
             delta, delta_delta = get_change_acceleration_rate(features)
             features = np.concatenate((features,delta,delta_delta),axis=1)
     ###!!!!!!! Need to Debug..
@@ -197,7 +197,7 @@ def get_feats(wavefile,feature_type,num_features,delta=False,noise_wavefile = No
         #extracted.append("stft")
         #features = get_stft(y,sr)
         #features -= (np.mean(features, axis=0) + 1e-8)
-        #if "delta" in feature_type.lower():
+        #if delta:
             #delta, delta_delta = get_change_acceleration_rate(features)
             #features = np.concatenate((features,delta,delta_delta),axis=1)
     if features.shape[1] != num_feature_columns: 
@@ -309,13 +309,13 @@ def get_freq_mag(y,sr,window_size=None, window_shift=None):
     return frequencies, magnitudes
 
 
-def save_feats2npy(class_labels,dict_labels_encoded,data_filename4saving,max_num_samples,dict_class_dataset_index_list,paths_list,labels_list,feature_type,num_filters,time_step,frame_width,limit=None,delta=False,noise_wavefile=None,vad=False,dataset_index=0):
+def save_feats2npy(class_labels,dict_labels_encoded,data_filename4saving,max_num_samples,dict_class_dataset_index_list,paths_list,labels_list,feature_type,num_filters,num_features,time_step,frame_width,limit=None,delta=False,noise_wavefile=None,vad=False,dataset_index=0):
     msg = "\nExtracting features from {} samples. \nFeatures will be saved in the file {}".format(max_num_samples,data_filename4saving)
     print(msg)
 
     #create empty array to fill with values
     expected_rows = max_num_samples*len(class_labels)*frame_width*time_step
-    feats_matrix = np.zeros((expected_rows,num_filters+1)) # +1 for the label
+    feats_matrix = np.zeros((expected_rows,num_features+1)) # +1 for the label
     #go through all data in dataset and fill in the matrix
     row = 0
     completed = False
@@ -340,7 +340,7 @@ def save_feats2npy(class_labels,dict_labels_encoded,data_filename4saving,max_num
                 wav_curr = wav_label[0]
                 label_curr = wav_label[1]
                 label_encoded = dict_labels_encoded[label_curr]
-                feats = coll_feats_manage_timestep(time_step,frame_width,wav_curr,feature_type,num_filters,delta=False, noise_wavefile=noise_wavefile,vad = True)
+                feats = coll_feats_manage_timestep(time_step,frame_width,wav_curr,feature_type,num_filters,delta=delta, noise_wavefile=noise_wavefile,vad = vad)
                 #add label column:
                 label_col = np.full((feats.shape[0],1),label_encoded)
                 feats = np.concatenate((feats,label_col),axis=1)
