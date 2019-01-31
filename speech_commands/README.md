@@ -153,4 +153,4 @@ Run the script.
 (env)..$ python3 train_models_CNN_LSTM_CNNLSTM.py
 ```
 
-Depending on the number of wavefiles, labels, features, and model settings, the duration may take from a few minutes to several hours. This runs with out a problem on a CPU.  
+Depending on the number of wavefiles, labels, features, and model settings, the duration may take from a few minutes to several hours. This runs with out a problem on a CPU. You should be able to use your computer normally (although I personally would avoid running other programs).
