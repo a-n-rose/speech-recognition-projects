@@ -46,7 +46,7 @@ Duration: to process entire speech commands dataset (with balanced classes), my 
 
 * Noe: it expects the subdirectories to contain waves corresponding to the subdirectory name (i.e. subdirectory 'bird' should have wavefiles with recordings of people saying "bird")
 
-2) organizes data into balanced train, validation, and test datasets (for simplicity, I want all classes to be represented evenly)
+2) organizes data into balanced train, validation, and test datasets (if you don't want balanced datasets, you'll have to adjust a few things... sorry. I might add functionality for that as well someday.)
 
 3) extracts speech features and saves to .npy files
 
