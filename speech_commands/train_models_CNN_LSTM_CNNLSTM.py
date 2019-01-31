@@ -1,3 +1,9 @@
+'''
+Model architectures are inspired from the (conference) paper:
+
+Kim, Myungjong & Cao, Beiming & An, Kwanghoon & Wang, Jun. (2018). Dysarthric Speech Recognition Using Convolutional LSTM Neural Network. 10.21437/interspeech.2018-2250. 
+
+'''
 
 import os
 import time
@@ -166,31 +172,39 @@ def main(model_type,timesteps,frame_width,num_features,color_scale,num_labels,ep
 
     
     #build the model architecture:
+    lstm_cells = 320
+    feature_map_filters = 40
+    pool_size = (3,3)
+    kernel_size = (4,8)
+    dense_hidden_units = 512
+    
     if 'lstm' == model_type.lower():
         model = Sequential()
-        model.add(LSTM(timesteps,return_sequences=True,input_shape=(frame_width,num_features))) 
-        model.add(LSTM(timesteps,return_sequences=True))
+        model.add(LSTM(lstm_cells,return_sequences=True,input_shape=(frame_width,num_features))) 
+        model.add(LSTM(lstm_cells,return_sequences=True))   
         
     elif 'cnn' == model_type.lower():
         model = Sequential()
         # 4x8 time-frequency filter (goes along both time and frequency axes)
-        model.add(Conv2D(32, kernel_size=(4,8), activation='relu',input_shape=(frame_width*timesteps,num_features,color_scale)))
+        model.add(Conv2D(feature_map_filters, kernel_size=kernel_size, activation='relu',input_shape=(frame_width*timesteps,num_features,color_scale)))
         #non-overlapping pool_size 3x3
-        model.add(MaxPooling2D(pool_size=(3,3)))
+        model.add(MaxPooling2D(pool_size=pool_size))
         model.add(Dropout(0.25))
+        model.add(Dense(dense_hidden_units))
         
     elif 'cnnlstm' == model_type.lower():
         cnn = Sequential()
-        cnn.add(Conv2D(num_features, kernel_size=(4,8), activation='relu'))
+        cnn.add(Conv2D(feature_map_filters, kernel_size=kernel_size, activation='relu'))
         #non-overlapping pool_size 3x3
-        cnn.add(MaxPooling2D(pool_size=(3,3)))
+        cnn.add(MaxPooling2D(pool_size=pool_size))
         cnn.add(Dropout(0.25))
         cnn.add(Flatten())
 
         #prepare stacked LSTM
         model = Sequential()
         model.add(TimeDistributed(cnn,input_shape=(timesteps,frame_width,num_features,color_scale)))
-        model.add(LSTM(timesteps,return_sequences=True))
+        model.add(LSTM(lstm_cells,return_sequences=True))
+        model.add(LSTM(lstm_cells,return_sequences=True))
 
     model.add(Flatten())
     model.add(Dense(num_labels,activation=activation_output)) 
@@ -272,15 +286,27 @@ def main(model_type,timesteps,frame_width,num_features,color_scale,num_labels,ep
     duration_training = round((end_training-start_training)/60,3)
     print("\nTotal duration = {}\nTraining duration = {}\n".format(duration_total,duration_training))
     
+    #document settings used in model
+    parameters = []
+    if "lstm" in model_type.lower():
+        parameters.append(([("lstm cells",lstm_cells)]))
+    if "cnn" in model_type.lower():
+        parameters.append(([("feature maps",feature_map_filters),("pool size",pool_size),("kernel size",kernel_size),("dense hidden units",dense_hidden_units)]))
+    parameters.append(([("test accuracy", acc),("test loss",loss)]))
+    
+    dict_parameters={}
+    dict_parameters[model_type] = parameters
+    
+    with open("./model_log/model_parameters.csv","a") as fd:
+        df.write(str(dict_parameters))
+    
     return True
-
-
 
 
 
 if __name__ == "__main__":
     
-    model_type = "lstm" # cnn, lstm, cnnlstm
+    model_type = "cnn" # cnn, lstm, cnnlstm
     timesteps = 5
     frame_width = 11
     num_features = 40
