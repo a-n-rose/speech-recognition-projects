@@ -24,7 +24,7 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
         timesteps = 5
     if context_window is None:
         context_window = 5
-    if data:
+    if delta:
         num_features = num_filters * 3
     else:
         num_features = num_filters
@@ -142,11 +142,11 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
     for i in tqdm(range(3)):
         dataset_index = i   # 0 = train, 1 = validation, 2 = test
         
-        #if you want to limit the number of recordings that features are extracted from:
-        #limit = int(max_nums_train_val_test[dataset_index]*.01)
+        ##if you want to limit the number of recordings that features are extracted from:
+        limit = int(max_nums_train_val_test[dataset_index]*.01)
         
-        #limit = None --> All .wav files in all label folders will be processed
-        limit = None
+        ##limit = None --> All .wav files in all label folders will be processed
+        #limit = None
         
         extraction_completed = featfun.save_feats2npy(labels_class,dict_labels_encoded,train_val_test_filenames[dataset_index],max_nums_train_val_test[dataset_index],dict_class_dataset_index_list,paths,labels_wavefile,feature_type,num_filters,num_features,timesteps,frame_width,limit=limit,delta=False,noise_wavefile=noise_path,vad=True,dataset_index=dataset_index)
         
