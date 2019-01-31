@@ -171,12 +171,21 @@ def main(model_type,timesteps,frame_width,num_features,color_scale,num_labels,ep
         loss_type = 'sparse_categorical_crossentropy' # if data have mutiple labels which are only integer encoded, *not* one hot encoded.
 
     
+    #create folders to store models, logs, and graphs
+    for folder in ["graphs","models","model_log"]:
+        try:
+            os.makedirs(folder)
+        except OSError as e:
+            print("Directory  ~  {}  ~  already exists".format(folder))
+            pass
+
+    
     #build the model architecture:
-    lstm_cells = 320
-    feature_map_filters = 40
-    pool_size = (3,3)
+    lstm_cells = num_features
+    feature_map_filters = 30
     kernel_size = (4,8)
-    dense_hidden_units = 512
+    pool_size = (3,3)
+    dense_hidden_units = 60
     
     if 'lstm' == model_type.lower():
         model = Sequential()
@@ -293,12 +302,17 @@ def main(model_type,timesteps,frame_width,num_features,color_scale,num_labels,ep
     if "cnn" in model_type.lower():
         parameters.append(([("feature maps",feature_map_filters),("pool size",pool_size),("kernel size",kernel_size),("dense hidden units",dense_hidden_units)]))
     parameters.append(([("test accuracy", acc),("test loss",loss)]))
+    parms = []
+    for item in parameters:
+        for i in item:
+            parms.append(i)
     
     dict_parameters={}
-    dict_parameters[model_type] = parameters
+    dict_parameters[model_type] = parms
+    print(dict_parameters)
     
     with open("./model_log/model_parameters.csv","a") as fd:
-        df.write(str(dict_parameters))
+        fd.write(str(dict_parameters))
     
     return True
 
@@ -306,20 +320,20 @@ def main(model_type,timesteps,frame_width,num_features,color_scale,num_labels,ep
 
 if __name__ == "__main__":
     
-    model_type = "cnn" # cnn, lstm, cnnlstm
+    model_type = "cnnlstm" # cnn, lstm, cnnlstm
     timesteps = 5
     frame_width = 11
-    num_features = 40
+    num_features = 120 #if delta, num_filters * 3
     color_scale = 1 # 1=gray, 3=color, 4=color+alpha?
-    num_labels = 3 
-    epochs = 10
+    num_labels = 30 
+    epochs = 50
     optimizer = 'adam' # 'adam' 'sgd'
     sparse_targets = True
     
     #these should *NOT* include "train_", "val_", "_test", or ".npy" etc.
     #these will be added in the script
-    file_path = "data_3words_shuffled_wnoise_vadfbank40"
-    file_name = "fbank_40_deltaFalse_noiseTrue_sr16000_window25_shift10_timestep5_framewidth11_date2019y1m30d21h39m20s"
+    file_path = "data_ALLwords_shuffled_fbank40"
+    file_name = "fbank40_deltaTrue_noiseTrue_vadTrue_timestep5_framewidth11_numlabels30_date2019y1m31d16h57m0s"
     
     
     main(
