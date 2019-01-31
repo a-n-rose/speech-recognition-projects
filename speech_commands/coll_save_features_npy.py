@@ -121,7 +121,7 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
     ############# FEATURE EXTRACTION ############
 
     frame_width = context_window*2 + 1
-    filename_save_data = "{0}{1}_delta{2}_noise{3}_vad{4}_timestep{5}_framewidth{6}_date{7}".format(feature_type,num_filters,delta,noise,vad,timesteps,frame_width,session_name)
+    filename_save_data = "{0}{1}_delta{2}_noise{3}_vad{4}_timestep{5}_framewidth{6}_numlabels{7}_date{8}".format(feature_type,num_filters,delta,noise,vad,timesteps,frame_width,len(labels_class),session_name)
     train_val_test_filenames = []
     train_val_test_directories = []
 
