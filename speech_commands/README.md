@@ -26,8 +26,11 @@ Kim, Myungjong & Cao, Beiming & An, Kwanghoon & Wang, Jun. (2018). Dysarthric Sp
 
 * CNN+LSTM: 1 CNN, 1 MaxPooling, 2 LSTMs stacked
 
+## Data
 
-Compatible with the following datasets:
+Compatible with (at least) the following datasets:
+
+### Speech Commands Dataset
 
 <a href="https://ai.googleblog.com/2017/08/launching-speech-commands-dataset.html">Speech Commands Dataset</a> (to download directly, click <a href="download.tensorflow.org/data/speech_commands_v0.01.tar.gz">here</a>)
 
