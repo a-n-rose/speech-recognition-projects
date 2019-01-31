@@ -127,7 +127,7 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
 
     #Set up directories where the .npy files will be saved (in a train, validation, and test folder)
     for i in ["train","val","test"]:
-        new_path = "./data_ALLwords_shuffled_{}{}_{}/".format(feature_type,num_filters,i)
+        new_path = "./data_{}{}_{}/".format(feature_type,num_features,i)
         train_val_test_filenames.append(new_path+"{}_".format(i)+filename_save_data)
         train_val_test_directories.append(new_path)
         try:
