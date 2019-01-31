@@ -4,9 +4,17 @@ import numpy as np
 from tqdm import tqdm
 import librosa
 import time
+import datetime
 
 import feature_extraction_functions as featfun
 
+
+#to keep saved files unique
+#include their names with a timestamp
+def get_date():
+    time = datetime.datetime.now()
+    time_str = "{}y{}m{}d{}h{}m{}s".format(time.year,time.month,time.day,time.hour,time.minute,time.second)
+    return(time_str)
 
 current_filename = os.path.basename(__file__)
 session_name = get_date()
