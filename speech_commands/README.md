@@ -44,7 +44,7 @@ Duration: to process entire speech commands dataset (with balanced classes), my 
 
 1) collects data and labels from subdirectories and subdirectory names.
 
-* Noe: it expects the subdirectories to contain waves corresponding to the subdirectory name (i.e. subdirectory 'bird' should have wavefiles with recordings of people saying "bird")
+* Note: it expects the subdirectories to contain waves corresponding to the subdirectory name (i.e. subdirectory 'bird' should have wavefiles with recordings of people saying "bird")
 
 2) organizes data into balanced train, validation, and test datasets (if you don't want balanced datasets, you'll have to adjust a few things... sorry. I might add functionality for that as well someday.)
 
