@@ -52,7 +52,7 @@ Duration: to process entire speech commands dataset (with balanced classes), my 
 
 ### 'train_models_CNN_LSTM_CNNLSTM.py'
 
-Duration: the shortest processing time is with the CNN. The LSTM models depend on the number of units/cells. These run on my CPU just fine.
+Duration: the shortest processing time is with the CNN. The LSTM models depend on the number of units/cells. These run on my CPU just fine. When I trained the CNN+LSTM with the entire (balanced) speech commands dataset, early stopping took place at epoch 18 out of 50, which took 1 hour and 45 minutes. Accuracy on test data was 64.8% (For reference, the winners of the Kaggle competition scored around 92%) 
 
 1) loads data from .npy files
 
