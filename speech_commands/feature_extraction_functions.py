@@ -182,7 +182,7 @@ def get_feats(wavefile,feature_type,num_features,delta=False,noise_wavefile = No
         extracted.append("mfcc")
         features = get_mfcc(y,sr,num_mfcc=num_features)
         features -= (np.mean(features, axis=0) + 1e-8)
-        if delta::
+        if delta:
             delta, delta_delta = get_change_acceleration_rate(features)
             features = np.concatenate((features,delta,delta_delta),axis=1)
     elif "fbank" in feature_type.lower():
