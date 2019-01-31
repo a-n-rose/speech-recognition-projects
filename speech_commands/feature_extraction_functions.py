@@ -316,38 +316,45 @@ def save_feats2npy(class_labels,dict_labels_encoded,data_filename4saving,max_num
     #create empty array to fill with values
     expected_rows = max_num_samples*len(class_labels)*frame_width*time_step
     feats_matrix = np.zeros((expected_rows,num_filters+1)) # +1 for the label
-    
     #go through all data in dataset and fill in the matrix
     row = 0
-    paths_labels_list_dataset = []
-    for i, label in enumerate(class_labels):
-        #labels_list_dataset = []
-        train_val_test_index_list = dict_class_dataset_index_list[label]
-        #print(train_val_test_index_list[dataset_index])
-        for k in train_val_test_index_list[dataset_index]:
-            paths_labels_list_dataset.append((paths_list[k],labels_list[k]))
+    completed = False
     
-    #shuffle indices:
-    random.shuffle(paths_labels_list_dataset)
-    
-    for j, wav_label in enumerate(paths_labels_list_dataset):
+    try:
+        paths_labels_list_dataset = []
+        for i, label in enumerate(class_labels):
+            #labels_list_dataset = []
+            train_val_test_index_list = dict_class_dataset_index_list[label]
+            #print(train_val_test_index_list[dataset_index])
+            for k in train_val_test_index_list[dataset_index]:
+                paths_labels_list_dataset.append((paths_list[k],labels_list[k]))
+        
+        #shuffle indices:
+        random.shuffle(paths_labels_list_dataset)
+        
+        for j, wav_label in enumerate(paths_labels_list_dataset):
 
-        if limit and j > limit:
-            break
-        else:
-            wav_curr = wav_label[0]
-            label_curr = wav_label[1]
-            label_encoded = dict_labels_encoded[label_curr]
-            feats = coll_feats_manage_timestep(time_step,frame_width,wav_curr,feature_type,num_filters,delta=False, noise_wavefile=noise_wavefile,vad = True)
-            #add label column:
-            label_col = np.full((feats.shape[0],1),label_encoded)
-            feats = np.concatenate((feats,label_col),axis=1)
-            
-            feats_matrix[row:row+feats.shape[0]] = feats
-            row += feats.shape[0]
-    np.save(data_filename4saving+".npy",feats_matrix)
+            if limit and j > limit:
+                break
+            else:
+                wav_curr = wav_label[0]
+                label_curr = wav_label[1]
+                label_encoded = dict_labels_encoded[label_curr]
+                feats = coll_feats_manage_timestep(time_step,frame_width,wav_curr,feature_type,num_filters,delta=False, noise_wavefile=noise_wavefile,vad = True)
+                #add label column:
+                label_col = np.full((feats.shape[0],1),label_encoded)
+                feats = np.concatenate((feats,label_col),axis=1)
+                
+                feats_matrix[row:row+feats.shape[0]] = feats
+                row += feats.shape[0]
+        completed = True
     
-    return True
+    except Exception as e:
+        print("Error occurred: {}\nStopped processing waves at row {} of new matrix.".format(e,row))
+    finally:
+        np.save(data_filename4saving+".npy",feats_matrix)
+    
+    return completed
     
     
 def coll_feats_manage_timestep(time_step,frame_width,wav,feature_type,num_filters,delta=False,noise_wavefile=None,vad = True):
