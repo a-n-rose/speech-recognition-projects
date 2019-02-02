@@ -65,7 +65,7 @@ To install all the python packages we will use, first start up your virtual envi
 $ source env/bin/activate
 ```
  
-In your virtual environment, run 'requirements.txt' to install all necessary packages via pip.
+In your virtual environment, run 'requirements.txt' to install all necessary packages via pip. This should only take a couple of minutes.
 
 ```
 (env)..$ pip install -r requirements.txt
