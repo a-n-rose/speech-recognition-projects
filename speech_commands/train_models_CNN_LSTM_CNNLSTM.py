@@ -19,8 +19,8 @@ import keras
 #from keras.layers import Dense, Conv2D, Flatten, LSTM, MaxPooling2D, Dropout, TimeDistributed, ConvLSTM2D
 from keras.callbacks import EarlyStopping,ReduceLROnPlateau,CSVLogger,ModelCheckpoint
 
-from generator_speech_CNN_LSTM import Generator
-import build_model as build
+from model_scripts.generator_speech_CNN_LSTM import Generator
+import model_scripts.build_model as build
 
 
 #to keep saved files unique
