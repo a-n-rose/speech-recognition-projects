@@ -3,7 +3,7 @@
 
 In this workshop, our goal is to experiment with speech feature extraction and the training of deep neural networks in Python.
 
-Applying deep learning to the speech signal has many uses. We all know that we can speak to Siri and Alexa, but speech can also be used for security purposes, as in <a href="https://arxiv.org/abs/1803.05427">speaker verification</a>, <a href="https://www.dw.com/en/voice-analysis-an-objective-diagnostic-tool-based-on-flawed-algorithms/a-17187057">healthcare contexts</a>, for example, identifying if a person has Parkinson's or if they have Attention Deficit Hyperactivity Disorder, among other applications as well. 
+Applying deep learning to the speech signal has many uses. We all know that we can speak to Siri and Alexa, but speech can also be used for security purposes, as in <a href="https://arxiv.org/abs/1803.05427">speaker verification</a>, as well as in <a href="https://www.dw.com/en/voice-analysis-an-objective-diagnostic-tool-based-on-flawed-algorithms/a-17187057">healthcare contexts</a>, for example, identifying if a person has Parkinson's or if they have Attention Deficit Hyperactivity Disorder. While I just listed a couple, there are many other fields where the analysis of the speech signal is relevant.
 
 In much of the research I have read, recurring speech features used in machine and deep learning are the <a href="http://practicalcryptography.com/miscellaneous/machine-learning/guide-mel-frequency-cepstral-coefficients-mfccs/">Mel Frequency Cepstral Coefficients</a> (MFCC) and the Mel Filterbank Energies (FBANK), which are similar but less filtered than the MFCC.
 
@@ -41,17 +41,29 @@ features_and_models_2019y2m2d22h6m19s
 
 
 ```
-This is just a folder name with a unique time stamp. Copy this from your command line, by highlighting it and pressing ctrl+shift+C. Open 'train_models_CNN_LSTM_CNNLSTM.py', scroll to the bottom of the script, and where it declares the variable 'project_head_folder', paste it.
+This is just a folder name with a unique time stamp. Copy this from your command line, by highlighting it and pressing ctrl+shift+C. When you run the 'train_models_CNN_LSTM_CNNLSTM.py' script, it will prompt you to enter the folder with the prepared data. Simply paste this folder name there by pressing ctrl+shift+V.
 
 ```
-if __name__ == "__main__":
-    
-    project_head_folder = "features_and_models_2019y2m2d22h6m19s"
+(env)..$ python4 train_models_CNN_LSTM_CNNLSTM.py
+
+Using TensorFlow backend.
+
+
+Which folder contains the train, validation, and test datasets you would like to train this model on?
+
+features_and_models_2019y2m2d22h6m19s
+
 ```
 
-Once you've done that, run the script. As is, the script should take appx. 4 minutes. 
+Press ENTER and it should start training! As is, the script should take appx. 4 minutes. 
 
-Once the scripts are through, you can look through the newly created files. Graphs depicting how well the model trained can be found there. 
+Once the scripts are through, you can look through the newly created files in your directory. You should see 'ml_speech_projects'. If you look in that folder, you will see a folder for each time you extracted features. It will have a name similar to this one:
+
+```
+features_and_models_2019y2m2d22h6m19s
+```
+
+Inside of that folder you will find all of the train, validation, and train datasets, a folder showing graphs of how the model trained, the label the labels were encoded as, and other information as well.
 
 In the workshop we will explore these scripts in detail, and change parameters to see how the training might be affected. Note: due to time constraints, we will not train on the entire dataset in the workshop. You are encouraged to do so at home, perhaps leaving the computer on and train through the night. 
 
