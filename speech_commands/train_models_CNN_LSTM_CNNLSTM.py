@@ -51,7 +51,7 @@ def main(model_type,epochs,optimizer,sparse_targets,patience=None):
     models_folder =  head_folder_curr_project+"/models"
     model_log_folder = head_folder_curr_project+"/"
     
-    for folder in [graphs_folder,models_folder,model_log_folder]:
+    for folder in [graphs_folder,models_folder]:
         if not os.path.exists(folder):
             os.makedirs(folder)
     
@@ -153,7 +153,7 @@ def main(model_type,epochs,optimizer,sparse_targets,patience=None):
 
     modelname_final = "{}_{}_{}tr_{}va_{}te_images_{}epochs_{}Optimizer_{}acc".format(modelname,time_stamp,len(train_data),len(val_data),len(test_data),epochs,optimizer,acc)
     print('Saving Model..')
-    model.save('./models/'+modelname_final+'.h5')
+    model.save('{}/'.format(models_folder)+modelname_final+'.h5')
     print('Done!')
     print("\nModel saved as:\n{}.h5".format(modelname_final))
     
