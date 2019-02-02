@@ -85,7 +85,7 @@ $ sudo apt-get install tk-dev
 
 1) In the directory where the workshop scripts are, create a folder called 'data'.
 
-2) Download the speech commands dataset <a href="http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz">here</a>. Save the zip folder in that folder.
+2) Download the speech commands dataset <a href="http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz">here</a>. Save the zip folder in the folder named 'data'.
 
 3) Extract the zipfile.
 
