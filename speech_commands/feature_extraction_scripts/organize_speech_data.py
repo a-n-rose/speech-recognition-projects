@@ -3,7 +3,7 @@ from pathlib import Path, PurePath
 #saving labels
 import csv
 import random
-from errors import DatasetMixing
+from feature_extraction_scripts.errors import DatasetMixing
 
 def collect_labels(data_path):
     p = Path(data_path)

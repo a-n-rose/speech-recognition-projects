@@ -11,7 +11,7 @@ import librosa
 import math
 import random
 
-from errors import NoSpeechDetected
+from feature_extraction_scripts.errors import NoSpeechDetected
 
     
 def match_length(noise,sr,desired_length):

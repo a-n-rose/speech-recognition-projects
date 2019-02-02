@@ -12,8 +12,8 @@ import numpy as np
 import random
 
 #my own speech prep: voice activity detection
-import prep_noise as prep_data_vad_noise
-from errors import NoSpeechDetected, LimitTooSmall
+import feature_extraction_scripts.prep_noise as prep_data_vad_noise
+from feature_extraction_scripts.errors import NoSpeechDetected, LimitTooSmall
 
  
  
