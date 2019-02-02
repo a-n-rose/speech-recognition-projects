@@ -30,8 +30,9 @@ def get_date():
     time_str = "{}y{}m{}d{}h{}m{}s".format(time.year,time.month,time.day,time.hour,time.minute,time.second)
     return(time_str)
 
-def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,):
-    
+def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience=None):
+    if patience is None:
+        patience = 10
     
     #####################################################################
     ######################## HOUSE KEEPING ##############################
@@ -93,7 +94,7 @@ def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,):
     #set up "callbacks" which help you keep track of what goes on during training
     #also saves the best version of the model and stops training if learning doesn't improve 
     checkpoint_name = modelname+"_{}epochs".format(epochs)
-    early_stopping_callback = EarlyStopping(monitor='val_loss', patience=5)
+    early_stopping_callback = EarlyStopping(monitor='val_loss', patience=patience)
     csv_logging = CSVLogger(filename='./model_log/{}_log.csv'.format(checkpoint_name))
     checkpoint_callback = ModelCheckpoint('./models/checkpoint_'+checkpoint_name+'.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 
@@ -191,7 +192,7 @@ def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,):
     dict_parameters={}
     dict_parameters[model_type] = parms
     #save in csv file
-    with open('./model_log/model_parameters.csv','a',newline='') as f:
+    with open('./ml_speech_projects/{}/model_log/model_parameters.csv'.format(project_head_folder),'a',newline='') as f:
         w = csv.writer(f)
         w.writerows(dict_parameters.items())
     
@@ -201,11 +202,12 @@ def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,):
 
 if __name__ == "__main__":
     
-    project_head_folder = "features_and_models_2019y2m2d17h23m28s"
+    project_head_folder = None #ENTER THE FOLDER NAME HERE
     model_type = "cnnlstm" # cnn, lstm, cnnlstm
     epochs = 100
     optimizer = 'adam' # 'adam' 'sgd'
     sparse_targets = True
+    patience = 5
     
     
-    main(project_head_folder,model_type,epochs,optimizer,sparse_targets)
+    main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience)

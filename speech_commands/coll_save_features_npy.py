@@ -36,7 +36,9 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
     
     start = time.time()
     time_stamp = get_date()
-    head_folder = "./ml_speech_projects/features_and_models_{}".format(time_stamp)
+    head_folder_beg = "./ml_speech_projects/"
+    curr_folder = "features_and_models_{}".format(time_stamp)
+    head_folder = head_folder_beg+curr_folder
     #create folder to store all data (encoded labels, features)
     if not os.path.exists(head_folder):
         os.makedirs(head_folder)
@@ -130,7 +132,8 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
         end_feature_extraction = time.time()
         print("Duration of feature extraction: {} minutes".format(round((end_feature_extraction-start_feature_extraction)/60,2)))
     
-        print("\nTo train a model, copy and paste \n\n'{}'\n\n into the model training script".format(head_folder))
+        print("\nTo train a model, copy and paste the following into the model training script:".upper())
+        print("\n\n'{}'\n\n".format(curr_folder))
         
         return True
     
@@ -147,7 +150,7 @@ if __name__=="__main__":
     #which directory has the data?
     data_path = "./data"
     #should there be a limit on how many waves are processed?
-    limit = False #False or fraction of data to be extracted
+    limit = .05 #False or fraction of data to be extracted
     #which type of features to extract?
     feature_type = "fbank" # "mfcc" TO DEBUG: "stft"
     #number of filters or coefficients?

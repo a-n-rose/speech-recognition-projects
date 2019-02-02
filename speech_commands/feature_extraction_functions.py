@@ -61,7 +61,7 @@ def get_feats(wavefile,feature_type,num_features,head_folder,delta=False,noise_w
             filename = '{}/no_speech_detected.csv'.format(head_folder)
             with open(filename,'a') as f:
                 w = csv.writer(f)
-                w.writerow(wavefile)
+                w.writerow([wavefile])
             
     if noise_wavefile:
         y = apply_noise(y,sr,noise_wavefile)
@@ -218,7 +218,7 @@ def save_feats2npy(labels_class,dict_labels_encoded,data_filename4saving,max_num
     #go through all data in dataset and fill in the matrix
     
     
-    msg = "\nFeature Extraction: Section {} of 3\nNow extracting features: {} wavefiles per class.\nProcessing in total: {} wavefiles \nFeatures will be saved in the file {}.npy\n\n".format(dataset_index+1,max_num_samples,len(labels_class)*max_num_samples,data_filename4saving)
+    msg = "\nFeature Extraction: Section {} of 3\nNow extracting features: {} wavefiles per class.\nWith {} classes, processing {} wavefiles.\nFeatures will be saved in the file {}.npy\n\n".format(dataset_index+1,max_num_samples,len(labels_class),len(labels_class)*max_num_samples,data_filename4saving)
     print(msg)
     
     row = 0
