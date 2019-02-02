@@ -11,6 +11,8 @@ import librosa
 import math
 import random
 
+from errors import NoSpeechDetected
+
     
 def match_length(noise,sr,desired_length):
     noise2 = np.array([])
@@ -105,22 +107,35 @@ def sound_index(speech_energy,speech_energy_mean,start = True):
                         break
                     return row, True
     else:
-        print("No speech detected.")
+        #print("No Speech Detected")
+        pass
     return beg, False
 
     
 def get_speech_samples(samples, sr):
-    signal_length = len(samples)
-    stft = wave2stft(samples,sr)
-    energy = get_energy(stft)
-    energy_mean = get_energy_mean(energy)
-    start = sound_index(energy,energy_mean,start=True)
-    end = sound_index(energy,energy_mean,start=False)
-    perc_start = start[0]/len(energy)
-    perc_end = end[0]/len(energy)
-    sample_start = int(perc_start*signal_length)
-    sample_end = int(perc_end*signal_length)
-    samples_speech = samples[sample_start:sample_end]
-    return samples_speech
+    try:
+        signal_length = len(samples)
+        stft = wave2stft(samples,sr)
+        energy = get_energy(stft)
+        energy_mean = get_energy_mean(energy)
+        beg = sound_index(energy,energy_mean,start=True)
+        end = sound_index(energy,energy_mean,start=False)
+        if beg[1] == False or end[1] == False:
+            raise NoSpeechDetected("No speech detected")
+        perc_start = beg[0]/len(energy)
+        perc_end = end[0]/len(energy)
+        sample_start = int(perc_start*signal_length)
+        sample_end = int(perc_end*signal_length)
+        samples_speech = samples[sample_start:sample_end]
+        
+        return samples_speech, True
+    
+    except NoSpeechDetected as e:
+        pass
+        
+    return samples, False
+    
+        
+    
     
    

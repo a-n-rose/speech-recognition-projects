@@ -1,13 +1,12 @@
 import sys
 import os
 import numpy as np
-from tqdm import tqdm
-import librosa
 import time
 import datetime
 
+import organize_speech_data as orgdata
 import feature_extraction_functions as featfun
-
+from errors import FeatureExtractionFail
 
 #to keep saved files unique
 #include their names with a timestamp
@@ -16,8 +15,8 @@ def get_date():
     time_str = "{}y{}m{}d{}h{}m{}s".format(time.year,time.month,time.day,time.hour,time.minute,time.second)
     return(time_str)
 
-
-def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=False,timesteps=None,context_window=None,noise_path=None):
+def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=False,timesteps=None,context_window=None,noise_path=None,limit=None):
+    #set defaults:
     if num_filters is None:
         num_filters = 40
     if timesteps is None:
@@ -28,11 +27,20 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
         num_features = num_filters * 3
     else:
         num_features = num_filters
+    #frame_width is the sum of frames including:
+    #1 central frame with a context window in front and one context window behind
+    frame_width = context_window*2 + 1
+
+    #####################################################################
+    ######################## HOUSE KEEPING ##############################
     
-    session_name = get_date()
-    
-    #############################################
-    ################## LABELS ###################
+    start = time.time()
+    time_stamp = get_date()
+    head_folder = "./ml_speech_projects/features_and_models_{}".format(time_stamp)
+    #create folder to store all data (encoded labels, features)
+    if not os.path.exists(head_folder):
+        os.makedirs(head_folder)
+        
     '''
     Collect all labels in data:
     Labels should be the subdirectories of the data directory
@@ -41,94 +49,21 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
     * starting with "_"
     * are typical GitHub files, like LICENSE
     '''
-    labels_class = featfun.collect_labels(data_path)
-    print(labels_class)
-    
+    labels_class = orgdata.collect_labels(data_path)
+
     '''
     Create labels-encoding dictionary:
     This helps when saving data later to npy files
     Integer encode the labels and save with feature data as label column
     '''
-    labels_sorted = sorted(labels_class)
-    dict_labels_encoded = {}
-    for i, label in enumerate(labels_sorted):
-        dict_labels_encoded[label] = i
-    print(dict_labels_encoded)
+    dict_labels_encoded = orgdata.create_save_dict_labels_encode(labels_class,head_folder)
     
-    '''
-    Create and save to .csv the encoded labels
-    Helpful for implementing the model later.
-    Better to know speech categorized as 'bird'
-    rather than '1'
-    '''
-    featfun.save_class_labels(labels_sorted,session_name)
-    
-    
-    
-    #############################################
-    ############## DATA ORGANIZATION ############
 
-    #collect filenames and labels of each filename
-    paths, labels_wavefile = featfun.collect_audio_and_labels(data_path)
-
-    #to balance out the classes, find the label/class w fewest recordings
-    max_num_per_class, min_label = featfun.get_min_samples_per_class(labels_class,labels_wavefile)
-
-    '''
-    Create dictionary with labels and their indices in the lists: labels_wavefile and paths
-    useful in separating the indices into balanced train, validation, and test datasets
-    '''
-    dict_class_index_list = featfun.make_dict_class_index(labels_class,labels_wavefile)
-    
-    '''
-    Calculate number of recordings for each dataset, 
-    keeping the data balanced between classes
-    * .8 of max number of samples --> train
-    * .1 of max number of samples --> validation
-    * .1 of max number of samples --> test
-    '''
-    max_nums_train_val_test = featfun.get_max_nums_train_val_test(max_num_per_class)
-
-    #randomly assign indices to train, val, test datasets:
-    dict_class_dataset_index_list = featfun.assign_indices_train_val_test(labels_class,dict_class_index_list,max_nums_train_val_test)
-
-    #make sure no indices mix between datasets:
-    train_indices = []
-    test_indices = []
-    val_indices = []
-    for label in labels_class:
-        label_indices = dict_class_dataset_index_list[label]
-        train_indices.append(label_indices[0])
-        val_indices.append(label_indices[1])
-        test_indices.append(label_indices[2])
-    print("Checking mix of datasets")
-    print(len(train_indices[0]))
-    #print(train_indices)
-    print(len(val_indices[0]))
-    print(len(test_indices[0]))
-    for train_index in train_indices[0]:
-        if train_index in test_indices or train_index in val_indices:
-            print("Training Index {} is in other datasets")
-    for val_index in val_indices[0]:
-        if val_index in train_indices or val_index in test_indices:
-            print("Val Index {} is in other datasets")
-    for test_index in test_indices[0]:
-        if test_index in train_indices or test_index in val_indices:
-            print("Test Index {} is in other datasets")
-
-
-    #############################################
-    ############# FEATURE EXTRACTION ############
-
-    frame_width = context_window*2 + 1
-    filename_save_data = "{0}{1}_delta{2}_noise{3}_vad{4}_timestep{5}_framewidth{6}_numlabels{7}_date{8}".format(feature_type,num_filters,delta,noise,vad,timesteps,frame_width,len(labels_class),session_name)
     train_val_test_filenames = []
     train_val_test_directories = []
-
-    #Set up directories where the .npy files will be saved (in a train, validation, and test folder)
     for i in ["train","val","test"]:
-        new_path = "./data_{}{}_{}/".format(feature_type,num_features,i)
-        train_val_test_filenames.append(new_path+"{}_".format(i)+filename_save_data)
+        new_path = "{}/data_{}/".format(head_folder,i)
+        train_val_test_filenames.append(new_path+"{}_features".format(i))
         train_val_test_directories.append(new_path)
         try:
             os.makedirs(new_path)
@@ -136,40 +71,88 @@ def main(data_path,feature_type,num_filters=None,delta=False,noise=False,vad=Fal
             print("Directory  ~  {}  ~  already exists".format(new_path))
             pass
 
+    
+    #############################################
+    ############## DATA ORGANIZATION ############
+
+    #collect filenames and labels of each filename
+    paths, labels_wavefile = orgdata.collect_audio_and_labels(data_path)
+
+    #to balance out the classes, find the label/class w fewest recordings
+    max_num_per_class, class_max_samps = orgdata.get_max_samples_per_class(labels_class,labels_wavefile)
+    
+    #LOG THE SETTINGS OF FEATURE EXTRACTION IN CSV FILE
+    dict_info_feature_extraction = {"data path":data_path,"limit":limit,"features":feature_type,"num original features":num_filters,"num total features":num_features,"delta":delta,"noise":noise,"beginning silence removal":vad,"timesteps":timesteps,"context window":context_window,"num classes":len(labels_class),"time stamp":time_stamp}
+    orgdata.log_extraction_settings(dict_info_feature_extraction,head_folder)
+    orgdata.log_class4balance(max_num_per_class,class_max_samps,head_folder)
+    '''
+    Create dictionary with labels and their indices in the lists: labels_wavefile and paths
+    useful in separating the indices into balanced train, validation, and test datasets
+    '''
+    dict_class_index_list = orgdata.make_dict_class_index(labels_class,labels_wavefile)
+    
+    '''
+    Assign number of recordings for each dataset, 
+    keeping the data balanced between classes
+    Defaults:
+    * .8 of max number of samples --> train
+    * .1 of max number of samples --> validation
+    * .1 of max number of samples --> test
+    '''
+    max_nums_train_val_test = orgdata.get_max_nums_train_val_test(max_num_per_class)
+
+    #randomly assign indices (evenly across class) to train, val, test datasets:
+    dict_class_dataset_index_list = orgdata.assign_indices_train_val_test(labels_class,dict_class_index_list,max_nums_train_val_test)
+
+    #make sure no indices mix between datasets:
+    orgdata.check_4_dataset_mixing(labels_class,dict_class_dataset_index_list)
+
+
+    #############################################
+    ############# FEATURE EXTRACTION ############
+
 
     start_feature_extraction = time.time()
 
-    #tqdm shows the progress of for loops in your commandline
-    #here it's honestly pointless, but I thought it was a cool 
-    #tool so I included it..
-    for i in tqdm(range(3)):
-        dataset_index = i   # 0 = train, 1 = validation, 2 = test
+    try:
         
-        ##if you want to limit the number of recordings that features are extracted from:
-        #limit = int(max_nums_train_val_test[dataset_index]*.01)
+        for i in range(3):
+            dataset_index = i   # 0 = train, 1 = validation, 2 = test
+            
+            extraction_completed = featfun.save_feats2npy(labels_class,dict_labels_encoded,train_val_test_filenames[dataset_index],max_nums_train_val_test[dataset_index],dict_class_dataset_index_list,paths,labels_wavefile,feature_type,num_filters,num_features,timesteps,frame_width,head_folder,limit=limit,delta=delta,noise_wavefile=noise_path,vad=vad,dataset_index=dataset_index)
+            
+            if extraction_completed:
+                print("\nRound {} feature extraction successful.\n".format(i+1))
+            else:
+                print("\nRound {} feature extraction was unsuccessful.".format(i+1))
+                raise FeatureExtractionFail()
+            
+        end_feature_extraction = time.time()
+        print("Duration of feature extraction: {} minutes".format(round((end_feature_extraction-start_feature_extraction)/60,2)))
+    
+        print("\nTo train a model, copy and paste \n\n'{}'\n\n into the model training script".format(head_folder))
         
-        ##limit = None --> All .wav files in all label folders will be processed
-        limit = None
-        
-        extraction_completed = featfun.save_feats2npy(labels_class,dict_labels_encoded,train_val_test_filenames[dataset_index],max_nums_train_val_test[dataset_index],dict_class_dataset_index_list,paths,labels_wavefile,feature_type,num_filters,num_features,timesteps,frame_width,limit=limit,delta=delta,noise_wavefile=noise_path,vad=vad,dataset_index=dataset_index)
-        
-        if extraction_completed:
-            print("\nRound {} feature extraction successful.\n".format(i))
-        else:
-            print("\nRound {} feature extraction was unsuccessful.".format(i))
-
-    end_feature_extraction = time.time()
-    print("Duration of feature extraction: {} minutes".format(round((end_feature_extraction-start_feature_extraction)/60,2)))
-
+        return True
+    
+    except FeatureExtractionFail:
+        print("Feature Extraction Error. Terminated feature extraction process.")
+        pass
+    
+    return False
+    
 if __name__=="__main__":
 
     #variables to set:
     
     #which directory has the data?
     data_path = "./data"
-    feature_type = "fbank" # "mfcc", "stft"
+    #should there be a limit on how many waves are processed?
+    limit = False #False or fraction of data to be extracted
+    #which type of features to extract?
+    feature_type = "fbank" # "mfcc" TO DEBUG: "stft"
+    #number of filters or coefficients?
     num_filters = 40 # 13, None
-    delta = True # Calculate the 1st and 2nd derivatives of features?
+    delta = False # Calculate the 1st and 2nd derivatives of features?
     noise = True # Add noise to speech data?
     vad = True #voice activity detection
     timesteps = 5
@@ -179,5 +162,5 @@ if __name__=="__main__":
     main(
         data_path,feature_type,
         num_filters=num_filters,delta=delta,noise=noise,vad=vad,
-        timesteps=timesteps,context_window=context_window,noise_path=noise_path
+        timesteps=timesteps,context_window=context_window,noise_path=noise_path,limit = limit
         )
