@@ -64,7 +64,7 @@ def log_class4balance(max_num_per_class,class_max_samps,head_folder):
     return None
 
 def log_extraction_settings(dict_extraction_settings,head_folder):
-    filename = '{}/features_models_log.csv'.format(head_folder)
+    filename = '{}/features_log.csv'.format(head_folder)
     with open(filename, 'a', newline='') as f:
         w = csv.writer(f)
         w.writerows(dict_extraction_settings.items())

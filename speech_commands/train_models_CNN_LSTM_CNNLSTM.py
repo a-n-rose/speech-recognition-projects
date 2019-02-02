@@ -30,7 +30,7 @@ def get_date():
     time_str = "{}y{}m{}d{}h{}m{}s".format(time.year,time.month,time.day,time.hour,time.minute,time.second)
     return(time_str)
 
-def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience=None):
+def main(model_type,epochs,optimizer,sparse_targets,patience=None):
     if patience is None:
         patience = 10
     
@@ -39,8 +39,19 @@ def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience
     
     start = time.time()
     time_stamp = get_date()
+    
+    print("\n\nWhich folder contains the train, validation, and test datasets you would like to train this model on?\n")
+    project_head_folder=input()
+    #project_head_folder = "features_and_models_2019y2m2d22h50m24s"
+    
+    head_folder_beg = "./ml_speech_projects/"
+    head_folder_curr_project = head_folder_beg+project_head_folder
     #create folders to store models, logs, and graphs
-    for folder in ["graphs","models","model_log"]:
+    graphs_folder = head_folder_curr_project+"/graphs"
+    models_folder =  head_folder_curr_project+"/models"
+    model_log_folder = head_folder_curr_project+"/"
+    
+    for folder in [graphs_folder,models_folder,model_log_folder]:
         if not os.path.exists(folder):
             os.makedirs(folder)
     
@@ -49,8 +60,8 @@ def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience
     
     
     #collect variables stored during feature extraction
-    feature_settings_file = "./ml_speech_projects/{}/features_models_log.csv".format(project_head_folder)
-    with open(feature_settings_file, mode='r') as infile:
+    load_feature_settings_file = head_folder_curr_project+"/features_log.csv".format(project_head_folder)
+    with open(load_feature_settings_file, mode='r') as infile:
         reader = csv.reader(infile)            
         feats_dict = {rows[0]:rows[1] for rows in reader}
     
@@ -95,8 +106,8 @@ def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience
     #also saves the best version of the model and stops training if learning doesn't improve 
     checkpoint_name = modelname+"_{}epochs".format(epochs)
     early_stopping_callback = EarlyStopping(monitor='val_loss', patience=patience)
-    csv_logging = CSVLogger(filename='./model_log/{}_log.csv'.format(checkpoint_name))
-    checkpoint_callback = ModelCheckpoint('./models/checkpoint_'+checkpoint_name+'.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+    csv_logging = CSVLogger(filename='{}/{}_log.csv'.format(model_log_folder,checkpoint_name))
+    checkpoint_callback = ModelCheckpoint('{}/checkpoint_'.format(models_folder)+checkpoint_name+'.h5', monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 
 
     #####################################################################
@@ -159,14 +170,14 @@ def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience
     plt.ylabel("loss")
     plt.xlabel("epoch")
     plt.legend(["train","validation"], loc="upper right")
-    plt.savefig("./graphs/{}_LOSS.png".format(modelname_final))
+    plt.savefig("{}/{}_LOSS.png".format(graphs_folder,modelname_final))
 
     plt.clf()
     plt.plot(history.history['acc'])
     plt.plot(history.history['val_acc'])
     plt.title("train vs validation accuracy")
     plt.legend(["train","validation"], loc="upper right")
-    plt.savefig("./graphs/{}_ACCURACY.png".format(modelname_final))
+    plt.savefig("{}/{}_ACCURACY.png".format(graphs_folder,modelname_final))
     
     end = time.time()
     duration_total = round((end-start)/60,3)
@@ -178,23 +189,24 @@ def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience
     ########## KEEP TRACK OF SETTINGS AND THE LOSS/ACCURACY #############
     
     #document settings used in model
-    parameters = []
+    parameters = {}
+    parameters["model type"] = model_type.lower()
+    parameters["time stamp"] = time_stamp
     if "lstm" in model_type.lower():
-        parameters.append(([("lstm cells",lstm_cells)]))
+        parameters["num cells"] = lstm_cells
     if "cnn" in model_type.lower():
-        parameters.append(([("cnn feature maps",feature_map_filters),("kernel size",kernel_size),("maxpooling pool size",pool_size),("dense hidden units",dense_hidden_units)]))
-    parameters.append(([("test accuracy", acc),("test loss",loss)]))
-    parms = []
-    for item in parameters:
-        for i in item:
-            parms.append(i)
-    
-    dict_parameters={}
-    dict_parameters[model_type] = parms
+        parameters["cnn feature maps"] = feature_map_filters
+        parameters["kernel size"] = kernel_size
+        parameters["maxpooling pool size"] = pool_size
+        if "cnn" == model_type.lower():
+            parameters["dense hidden units"]
+    parameters["test acc"] = acc
+    parameters["test loss"] = loss
+
     #save in csv file
     with open('./ml_speech_projects/{}/model_log/model_parameters.csv'.format(project_head_folder),'a',newline='') as f:
         w = csv.writer(f)
-        w.writerows(dict_parameters.items())
+        w.writerows(parameters.items())
     
     return True
 
@@ -202,7 +214,7 @@ def main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience
 
 if __name__ == "__main__":
     
-    project_head_folder = None #ENTER THE FOLDER NAME HERE
+    
     model_type = "cnnlstm" # cnn, lstm, cnnlstm
     epochs = 100
     optimizer = 'adam' # 'adam' 'sgd'
@@ -210,4 +222,4 @@ if __name__ == "__main__":
     patience = 5
     
     
-    main(project_head_folder,model_type,epochs,optimizer,sparse_targets,patience)
+    main(model_type,epochs,optimizer,sparse_targets,patience)
