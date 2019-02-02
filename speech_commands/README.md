@@ -15,15 +15,7 @@ Python offers libraries for audio analysis, <a href="https://librosa.github.io/"
 
 For Installation instructions, see <a href="https://github.com/a-n-rose/speech-recognition-projects/blob/master/speech_commands/INSTALLATION.md">here</a>.
 
-After you have installed everything, I suggest reading through the scripts:
-
-1) coll_save_features_npy.py
-
-2) generator_speech_CNN_LSTM.py
-
-Commented out lines should give you some information about the script and what we want to do.
-
-To get started, start up your virtual environment:
+After you have installed everything, start up your virtual environment:
 
 ```
 $ source env/bin/activate
