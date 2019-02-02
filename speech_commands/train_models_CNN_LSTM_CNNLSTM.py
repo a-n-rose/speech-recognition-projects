@@ -204,7 +204,7 @@ def main(model_type,epochs,optimizer,sparse_targets,patience=None):
     parameters["test loss"] = loss
 
     #save in csv file
-    with open('./ml_speech_projects/{}/model_log/model_parameters.csv'.format(project_head_folder),'a',newline='') as f:
+    with open('{}model_parameters.csv'.format(model_log_folder),'a',newline='') as f:
         w = csv.writer(f)
         w.writerows(parameters.items())
     
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     epochs = 100
     optimizer = 'adam' # 'adam' 'sgd'
     sparse_targets = True
-    patience = 5
+    patience = 5 
     
     
     main(model_type,epochs,optimizer,sparse_targets,patience)
