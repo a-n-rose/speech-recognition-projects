@@ -20,10 +20,10 @@ After you have installed everything, start up your virtual environment:
 ```
 $ source env/bin/activate
 ```
-As it is, the script 'coll_save_features_npy.py' will extract only 5% of all the speech data. If you run the script 'as is', this will take appx. 6 minutes to complete. 
+As it is, the script 'extract_features.py' will extract only 5% of all the speech data. If you run the script 'as is', this will take appx. 6 minutes to complete. 
 
 ```
-(env)..$ python3 coll_save_features_npy.py
+(env)..$ python3 extract_features.py
 ```
 This should print out something like this when it's done:
 
